@@ -3,4 +3,9 @@ project(Taller_2IM)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(Taller_2IM main.cpp)
+add_executable(Taller_2IM main.cpp
+        Cola.cpp
+        Cola.h
+        Nodo.cpp
+        Nodo.h
+)
