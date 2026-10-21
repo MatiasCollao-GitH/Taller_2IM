@@ -1,5 +1,5 @@
-#ifndef TALLER_1_IM_PACIENTE_H
-#define TALLER_1_IM_PACIENTE_H
+#ifndef TALLER_2IM_NODODECISION_H
+#define TALLER_2IM_NODODECISION_H
 
 #pragma once
 #include "Persona.h"
@@ -19,9 +19,7 @@ private:
     std::string servicio;
 
 public:
-    Paciente(std::string id, std::string nombre, int edad, double temperatura,
-             int presionArterial, int dolor, std::string tipoDolor,
-             bool trauma, bool sintomasNeurologicos, bool requiereCirugia,
+    Paciente(std::string id, std::string nombre, int edad, double temperatura, int presionArterial, int dolor, std::string tipoDolor, bool trauma, bool sintomasNeurologicos, bool requiereCirugia,
              int diasHospitalizacion);
 
     ~Paciente() override;
@@ -46,4 +44,4 @@ public:
     void mostrarResumenBusqueda() const;
 };
 
-#endif //TALLER_1_IM_PACIENTE_H
+#endif //TALLER_2IM_NODODECISION_H

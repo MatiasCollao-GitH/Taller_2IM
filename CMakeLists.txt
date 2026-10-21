@@ -18,4 +18,7 @@ add_executable(Taller_2IM main.cpp
         estructuras/Lista.h
         dominio/Historial.cpp
         dominio/Historial.h
+        estructuras/NodoDecision.h
+        estructuras/ArbolDecision.cpp
+        estructuras/ArbolDecision.h
 )
