@@ -1,8 +1,37 @@
 //
-// Created by ignac on 12/10/2026.
+// Created by Matías Collao on 14-09-2026.
 //
 
-#include "Cola.h"
+#ifndef TALLER_1_IM_COLA_H
+#define TALLER_1_IM_COLA_H
+#include "Nodo.h"
+#include <iostream>
+
+template <class T>
+class Cola {
+private:
+    Nodo<T>* inicio;
+    Nodo<T>* final;
+    int tamano;
+    bool vacio;
+
+public:
+    Cola();
+    int size();
+    void push(T valor);
+
+    T front();
+    T back();
+    void pop();
+    bool isEmpty();
+    ~Cola();
+
+
+    void imprimir();
+    Nodo<T>* getInicio() const;
+};
+
+
 
 template<class T>
 Cola<T>::Cola() {
@@ -58,27 +87,37 @@ void Cola<T>::pop() {
     }
     Nodo<T>* aEliminar = this->inicio;
     this->inicio = this->inicio->getNext();
+    
+    if (this->inicio == nullptr) {
+        this->final = nullptr;
+        this->vacio = true;
+    }
     delete aEliminar;
     this->tamano--;
 }
 
 template<class T>
 bool Cola<T>::isEmpty() {
-    return this->vacio;
+    return this->inicio == nullptr;
 }
 
 template<class T>
 void Cola<T>::imprimir() {
     Nodo<T>* actual = this->inicio;
 
+    std::cout << "=== PACIENTES EN ESPERA ===" << std::endl;
+
+    int cont = 1;
     while (actual != nullptr) {
         T paciente = actual->getValor();
 
         if (paciente != nullptr) {
-            paciente->datos();
+            std::cout << cont << ". " << paciente->getId() << " - " << paciente->getNombre() << std::endl;
         }
         actual = actual->getNext();
+        cont++;
     }
+    std::cout << std::endl;
 }
 
 template<class T>
@@ -89,4 +128,18 @@ Nodo<T> *Cola<T>::getInicio() const {
 
 template<class T>
 Cola<T>::~Cola() {
+    while (!this->isEmpty()) {
+        this->pop();
+    }
 }
+
+
+
+
+
+
+
+
+
+
+#endif //TALLER_1_IM_COLA_H

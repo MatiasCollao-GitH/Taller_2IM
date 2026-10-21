@@ -1,11 +1,9 @@
 #include <iostream>
 using namespace std;
-
+#include "logica/Sistema.h"
 
 int main() {
-
-    cout << "que pasa padre?" << endl;
-
+    Sistema sistema;
+    sistema.iniciar();
     return 0;
-
 }

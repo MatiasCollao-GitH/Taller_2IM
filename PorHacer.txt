@@ -1,0 +1,14 @@
+0.)-Mejorar y Arreglar Taller 1
+1.)-Cargar NUEVOS Pacientes (Cmabiar lectura, misma cola)
+2.)-Árbol de desición
+	-Construcción
+	-Recorridos
+	-evaluacion
+	-determinacion de servicio
+	-(Poner en el REadme el qcritero que ocupamos)
+3.)-Árbol AVL (POR SERVICIO -> Clase construcción arbol)
+	-insertar
+	-buscar por ID o nombre
+	-Recorrido InOr PreOR PosOr
+	-Altura
+	-Balance
