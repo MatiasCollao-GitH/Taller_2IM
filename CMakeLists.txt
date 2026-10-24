@@ -21,4 +21,7 @@ add_executable(Taller_2IM main.cpp
         estructuras/NodoDecision.h
         estructuras/ArbolDecision.cpp
         estructuras/ArbolDecision.h
+        estructuras/NodoAVL.h
+        estructuras/AVL.cpp
+        estructuras/AVL.h
 )
