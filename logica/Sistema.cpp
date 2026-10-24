@@ -11,6 +11,10 @@
 #include "../estructuras/Nodo.h"
 #include "../dominio/Paciente.h"
 #include "../dominio/Servicio.h"
+
+#include <cmath>
+#include <stdexcept>
+#include <exception>
 using namespace std;
 
 void Sistema::iniciar() {
@@ -81,49 +85,84 @@ bool Sistema::existePaciente(std::string id) {
 
 void Sistema::leer() {
     ifstream archivo("pacientes.txt");
+
     if (!archivo.is_open()) {
         cerr << "Error: No se pudo abrir el archivo pacientes.txt" << endl;
         return;
     }
 
     string linea;
-    while (getline(archivo,linea)) {
+
+    while (getline(archivo, linea)) {
+        if (!linea.empty() && linea.back() == '\r') {
+            linea.pop_back();
+        }
+
         if (linea.empty()) {
             continue;
         }
 
         stringstream ss(linea);
-        string id, nombre, stringEdad, servicio;
 
-        if (getline(ss, id, ';')&&
+        string id, nombre, stringEdad;
+        string stringTemperatura, stringPresion, stringDolor;
+        string tipoDolor, stringTrauma, stringSintomas;
+        string stringCirugia, stringDias;
+
+        if (getline(ss, id, ';') &&
             getline(ss, nombre, ';') &&
             getline(ss, stringEdad, ';') &&
-            getline(ss, servicio)) {
+            getline(ss, stringTemperatura, ';') &&
+            getline(ss, stringPresion, ';') &&
+            getline(ss, stringDolor, ';') &&
+            getline(ss, tipoDolor, ';') &&
+            getline(ss, stringTrauma, ';') &&
+            getline(ss, stringSintomas, ';') &&
+            getline(ss, stringCirugia, ';') &&
+            getline(ss, stringDias)) {
 
             try {
                 int edad = stoi(stringEdad);
-                if (!esServicioValido(servicio)) {
-                    cerr << "Error: Servicio invalido (" << servicio << ")" << endl;
-                    continue;
-                }
+                double temperatura = stod(stringTemperatura);
+                int presion = stoi(stringPresion);
+                int dolor = stoi(stringDolor);
+                int trauma = stoi(stringTrauma);
+                int sintomas = stoi(stringSintomas);
+                int cirugia = stoi(stringCirugia);
+                int dias = stoi(stringDias);
 
                 if (existePaciente(id)) {
-                    cerr << "Error: Paciente con ID duplicado (" << id << ")" << endl;
+                    cerr << "Error: Paciente con ID duplicado ("
+                         << id << ")" << endl;
                     continue;
                 }
 
-                Paciente* nuevo = new Paciente(id,nombre,edad,servicio);
+                Paciente* nuevo = new Paciente(
+                    id,
+                    nombre,
+                    edad,
+                    temperatura,
+                    presion,
+                    dolor,
+                    tipoDolor,
+                    trauma == 1,
+                    sintomas == 1,
+                    cirugia == 1,
+                    dias
+                );
 
                 colaEspera->push(nuevo);
 
-            } catch (invalid_argument& e) {
-                cerr << "Error: Edad Formato" << endl;
+            } catch (const std::exception& e) {
+                cerr << "Error: Dato numerico invalido o fuera de rango"
+                     << endl;
             }
+
         } else {
-            cerr << "Error: Formato e linea invalido" << endl;
+            cerr << "Error: Formato de linea invalido" << endl;
         }
     }
-    //colaEspera->imprimir();// Complicado y Simple de hacer solo para comprobar que el guardado funciona
+
     archivo.close();
 }
 

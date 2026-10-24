@@ -1,5 +1,5 @@
-#ifndef TALLER_2IM_NODODECISION_H
-#define TALLER_2IM_NODODECISION_H
+#ifndef TALLER_2IM_PACIENTE_H
+#define TALLER_2IM_PACIENTE_H
 
 #pragma once
 #include "Persona.h"
@@ -44,4 +44,4 @@ public:
     void mostrarResumenBusqueda() const;
 };
 
-#endif //TALLER_2IM_NODODECISION_H
+#endif //TALLER_2IM_PACIENTE_H
