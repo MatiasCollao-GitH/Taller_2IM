@@ -104,83 +104,163 @@ void Sistema::leer() {
     ifstream archivo("pacientes.txt");
 
     if (!archivo.is_open()) {
-        cerr << "Error: No se pudo abrir el archivo pacientes.txt" << endl;
+        cerr << "Error: No se pudo abrir pacientes.txt" << endl;
         return;
     }
 
-    string linea;
+    auto limpiar = [](string texto) -> string {
+        size_t inicio = texto.find_first_not_of(" \t\r\n");
 
-    while (getline(archivo, linea)) {
-        if (!linea.empty() && linea.back() == '\r') {
-            linea.pop_back();
+        if (inicio == string::npos) {
+            return "";
         }
 
-        if (linea.empty()) {
+        size_t fin = texto.find_last_not_of(" \t\r\n");
+        return texto.substr(inicio, fin - inicio + 1);
+    };
+
+    auto convertirEntero = [](const string& texto) -> int {
+        size_t posicion;
+        int valor = stoi(texto, &posicion);
+
+        if (posicion != texto.size()) {
+            throw invalid_argument("Numero entero incompleto");
+        }
+
+        return valor;
+    };
+
+    auto convertirDecimal = [](const string& texto) -> double {
+        size_t posicion;
+        double valor = stod(texto, &posicion);
+
+        if (posicion != texto.size() || !std::isfinite(valor)) {
+            throw invalid_argument("Numero decimal invalido");
+        }
+
+        return valor;
+    };
+
+    string linea;
+    int numeroLinea = 0;
+
+    while (getline(archivo, linea)) {
+        numeroLinea++;
+
+        if (limpiar(linea).empty()) {
             continue;
         }
 
-        stringstream ss(linea);
+        try {
+            int separadores = 0;
 
-        string id, nombre, stringEdad;
-        string stringTemperatura, stringPresion, stringDolor;
-        string tipoDolor, stringTrauma, stringSintomas;
-        string stringCirugia, stringDias;
-
-        if (getline(ss, id, ';') &&
-            getline(ss, nombre, ';') &&
-            getline(ss, stringEdad, ';') &&
-            getline(ss, stringTemperatura, ';') &&
-            getline(ss, stringPresion, ';') &&
-            getline(ss, stringDolor, ';') &&
-            getline(ss, tipoDolor, ';') &&
-            getline(ss, stringTrauma, ';') &&
-            getline(ss, stringSintomas, ';') &&
-            getline(ss, stringCirugia, ';') &&
-            getline(ss, stringDias)) {
-
-            try {
-                int edad = stoi(stringEdad);
-                double temperatura = stod(stringTemperatura);
-                int presion = stoi(stringPresion);
-                int dolor = stoi(stringDolor);
-                int trauma = stoi(stringTrauma);
-                int sintomas = stoi(stringSintomas);
-                int cirugia = stoi(stringCirugia);
-                int dias = stoi(stringDias);
-
-                if (existePaciente(id)) {
-                    cerr << "Error: Paciente con ID duplicado ("
-                         << id << ")" << endl;
-                    continue;
+            for (char caracter : linea) {
+                if (caracter == ';') {
+                    separadores++;
                 }
-
-                Paciente* nuevo = new Paciente(
-                    id,
-                    nombre,
-                    edad,
-                    temperatura,
-                    presion,
-                    dolor,
-                    tipoDolor,
-                    trauma == 1,
-                    sintomas == 1,
-                    cirugia == 1,
-                    dias
-                );
-
-                colaEspera->push(nuevo);
-
-            } catch (const std::exception& e) {
-                cerr << "Error: Dato numerico invalido o fuera de rango"
-                     << endl;
             }
 
-        } else {
-            cerr << "Error: Formato de linea invalido" << endl;
+            if (separadores != 10) {
+                throw invalid_argument(
+                    "Se requieren exactamente 11 campos"
+                );
+            }
+
+            string campos[11];
+            stringstream ss(linea);
+
+            for (int i = 0; i < 11; i++) {
+                if (!getline(ss, campos[i], ';')) {
+                    throw invalid_argument("Faltan campos");
+                }
+
+                campos[i] = limpiar(campos[i]);
+
+                if (campos[i].empty()) {
+                    throw invalid_argument("Hay campos vacios");
+                }
+            }
+
+            string id = campos[0];
+            string nombre = campos[1];
+            int edad = convertirEntero(campos[2]);
+            double temperatura = convertirDecimal(campos[3]);
+            int presion = convertirEntero(campos[4]);
+            int dolor = convertirEntero(campos[5]);
+            string tipoDolor = campos[6];
+            int trauma = convertirEntero(campos[7]);
+            int sintomas = convertirEntero(campos[8]);
+            int cirugia = convertirEntero(campos[9]);
+            int dias = convertirEntero(campos[10]);
+
+            if (edad < 0 || edad > 130) {
+                throw invalid_argument("Edad fuera de rango");
+            }
+
+            if (temperatura < 25 || temperatura > 45) {
+                throw invalid_argument("Temperatura fuera de rango");
+            }
+
+            if (presion <= 0 || presion > 300) {
+                throw invalid_argument("Presion fuera de rango");
+            }
+
+            if (dolor < 0 || dolor > 10) {
+                throw invalid_argument("Dolor debe estar entre 0 y 10");
+            }
+
+            if ((trauma != 0 && trauma != 1) ||
+                (sintomas != 0 && sintomas != 1) ||
+                (cirugia != 0 && cirugia != 1)) {
+                throw invalid_argument(
+                    "Trauma, sintomas y cirugia deben ser 0 o 1"
+                );
+            }
+
+            if (dias < 0) {
+                throw invalid_argument(
+                    "Dias de hospitalizacion no puede ser negativo"
+                );
+            }
+
+            if (tipoDolor != "pecho" &&
+                tipoDolor != "cabeza" &&
+                tipoDolor != "abdomen" &&
+                tipoDolor != "extremidad" &&
+                tipoDolor != "otro") {
+                throw invalid_argument("Tipo de dolor invalido");
+            }
+
+            if (existePaciente(id)) {
+                throw invalid_argument("ID duplicado: " + id);
+            }
+
+            Paciente* nuevo = new Paciente(
+                id,
+                nombre,
+                edad,
+                temperatura,
+                presion,
+                dolor,
+                tipoDolor,
+                trauma == 1,
+                sintomas == 1,
+                cirugia == 1,
+                dias
+            );
+
+            try {
+                this->colaEspera->push(nuevo);
+            } catch (...) {
+                delete nuevo;
+                throw;
+            }
+
+        } catch (const std::exception& e) {
+            cerr << "Error en linea " << numeroLinea
+                 << ": " << e.what() << endl;
         }
     }
-
-    archivo.close();
 }
 
 void Sistema::revisarHistorial() {
@@ -497,6 +577,9 @@ void Sistema::menu() {
                 "7. Salir\n"
                 "\nSeleccionar opcion: " << endl;
         cin >> opcion;
+        if (cin.eof()) {
+            break;
+        }
     if (cin.fail()) {
         cout << "Error: Opcion desconocida, intente nuevamente: " << endl;
         opcion = 0;
@@ -517,6 +600,8 @@ void Sistema::menu() {
         } else if (opcion == 7) {
             cout << "Hasta luego :D." << endl;
             break;
+        } else {
+            cout << "Opcion invalida. Seleccione entre 1 y 7." << endl;
         }
     }
 
