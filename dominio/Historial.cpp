@@ -6,8 +6,28 @@ Historial::Historial() {
     this->pilaAtenciones = new Stack<Paciente*>();
 }
 
-void Historial::registrarAtencion(Paciente *paciente) {
-    this->pilaAtenciones->push(paciente);
+void Historial::registrarAtencion(Paciente* paciente) {
+    if (paciente == nullptr) {
+        return;
+    }
+
+    Paciente* copia = new Paciente(
+        paciente->getId(),
+        paciente->getNombre(),
+        paciente->getEdad(),
+        paciente->getTemperatura(),
+        paciente->getPresionArterial(),
+        paciente->getDolor(),
+        paciente->getTipoDolor(),
+        paciente->getTrauma(),
+        paciente->getSintomasNeurologicos(),
+        paciente->getRequiereCirugia(),
+        paciente->getDiasHospitalizacion()
+    );
+
+    copia->setServicio(paciente->getServicio());
+
+    this->pilaAtenciones->push(copia);
 }
 
 bool Historial::isEmpty() {
@@ -35,5 +55,11 @@ void Historial::mostrarHistorial() {
 }
 
 Historial::~Historial() {
+    while (!this->pilaAtenciones->isEmpty()) {
+        Paciente* copia = this->pilaAtenciones->getHead()->getValor();
+        this->pilaAtenciones->pop();
+        delete copia;
+    }
+
     delete this->pilaAtenciones;
 }

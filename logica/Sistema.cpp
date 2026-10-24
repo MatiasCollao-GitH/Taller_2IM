@@ -309,10 +309,51 @@ void Sistema::verDepartamento() {
         return;
     }
 
-    cout << "\nPacientes ordenados por ID:" << endl;
-    pacientes->mostrarInorden();
+    int consulta;
 
-    cout << endl;
+    while (true) {
+        cout << "\n=== CONSULTAS DEL AVL ===\n"
+                "1. Mostrar inorden\n"
+                "2. Mostrar preorden\n"
+                "3. Mostrar postorden\n"
+                "4. Mostrar altura\n"
+                "5. Mostrar alturas y balances por nodo\n"
+                "6. Volver al menu principal\n"
+                "Seleccione opcion: ";
+
+        cin >> consulta;
+
+        if (cin.eof()) {
+            return;
+        }
+
+        if (cin.fail()) {
+            cout << "Opcion invalida" << endl;
+            cin.clear();
+            cin.ignore(10000, '\n');
+            continue;
+        }
+
+        if (consulta == 1) {
+            cout << "\nInorden:\n";
+            pacientes->mostrarInorden();
+        } else if (consulta == 2) {
+            cout << "\nPreorden:\n";
+            pacientes->mostrarPreorden();
+        } else if (consulta == 3) {
+            cout << "\nPostorden:\n";
+            pacientes->mostrarPostorden();
+        } else if (consulta == 4) {
+            cout << "Altura del AVL: "
+                 << pacientes->getAltura() << endl;
+        } else if (consulta == 5) {
+            pacientes->mostrarBalances();
+        } else if (consulta == 6) {
+            return;
+        } else {
+            cout << "Opcion invalida" << endl;
+        }
+    }
 }
 
 void Sistema::buscarPaciente() {
@@ -371,6 +412,76 @@ void Sistema::buscarPaciente() {
     }
 }
 
+void Sistema::eliminarPaciente() {
+    cin.ignore(10000, '\n');
+
+    string id;
+
+    cout << "\n=== ELIMINAR PACIENTE ===\n";
+    cout << "Ingrese ID: ";
+    getline(cin, id);
+
+    if (id.find_first_not_of(" \t\r") == string::npos) {
+        cout << "Debe ingresar un ID." << endl;
+        return;
+    }
+
+    Nodo<Servicio*>* actual = this->listaServicios->getCabeza();
+
+    while (actual != nullptr) {
+        Servicio* servicio = actual->getValor();
+
+        if (servicio->getArbolPacientes()->eliminar(id)) {
+            cout << "Paciente " << id
+                 << " eliminado de " << servicio->getNombre()
+                 << "." << endl;
+            return;
+        }
+
+        actual = actual->getNext();
+    }
+
+    cout << "No se encontro el paciente en los servicios." << endl;
+}
+
+void Sistema::verRecorridosDecision() {
+    int opcion;
+
+    while (true) {
+        cout << "\n=== ARBOL DE DECISION ===\n"
+                "1. Mostrar preorden\n"
+                "2. Mostrar inorden\n"
+                "3. Mostrar postorden\n"
+                "4. Volver al menu principal\n"
+                "Seleccione opcion: ";
+
+        cin >> opcion;
+
+        if (cin.eof()) {
+            return;
+        }
+
+        if (cin.fail()) {
+            cout << "Opcion invalida" << endl;
+            cin.clear();
+            cin.ignore(10000, '\n');
+            continue;
+        }
+
+        if (opcion == 1) {
+            this->arbolDecision->mostrarPreorden();
+        } else if (opcion == 2) {
+            this->arbolDecision->mostrarInorden();
+        } else if (opcion == 3) {
+            this->arbolDecision->mostrarPostorden();
+        } else if (opcion == 4) {
+            return;
+        } else {
+            cout << "Opcion invalida" << endl;
+        }
+    }
+}
+
 void Sistema::menu() {
 
     int opcion = 0;
@@ -381,7 +492,9 @@ void Sistema::menu() {
                 "2. Ver departamento\n"
                 "3. Revisar historial de atencion\n"
                 "4. Buscar paciente\n"
-                "5. Salir\n"
+                "5. Eliminar paciente por ID\n"
+                "6. Ver recorridos del arbol de decision\n"
+                "7. Salir\n"
                 "\nSeleccionar opcion: " << endl;
         cin >> opcion;
     if (cin.fail()) {
@@ -398,6 +511,10 @@ void Sistema::menu() {
         } else if (opcion == 4) {
             buscarPaciente();
         } else if (opcion == 5) {
+            eliminarPaciente();
+        } else if (opcion == 6) {
+            verRecorridosDecision();
+        } else if (opcion == 7) {
             cout << "Hasta luego :D." << endl;
             break;
         }

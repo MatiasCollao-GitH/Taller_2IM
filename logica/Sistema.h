@@ -31,6 +31,8 @@ public:
     void verDepartamento();
     void atenderPacientes();
     void buscarPaciente();
+    void eliminarPaciente();
+    void verRecorridosDecision();
 
     Servicio* buscarServicio(std::string nombre);
 
