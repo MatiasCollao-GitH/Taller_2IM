@@ -20,6 +20,7 @@ using namespace std;
 void Sistema::iniciar() {
     colaEspera = new Cola<Paciente*>();
     this->historial = new Historial();
+    this->arbolDecision = new ArbolDecision();
 
     inicializarServicios();
     leer();
@@ -219,12 +220,18 @@ void Sistema::atenderPacientes() {
         Paciente* paciente = this->colaEspera->front();
 
         //Buscamos el servicio que corresponda
-        Servicio* servicio = buscarServicio(paciente->getServicio());
+        string ruta;
+        string servicioAsignado =
+            this->arbolDecision->evaluarPaciente(paciente, ruta);
+
+        Servicio* servicio = buscarServicio(servicioAsignado);
 
         if (servicio == nullptr) {
             cout << "Error: No se encontró el servicio del paciente." << endl;
             break;
         }
+
+        paciente->setServicio(servicioAsignado);
 
         cout << "=== ATENDIENDO PACIENTES ===" << endl;
 
@@ -240,6 +247,8 @@ void Sistema::atenderPacientes() {
 
         //Lo eliminamos de la cola de espera
         this->colaEspera->pop();
+
+        cout << "Ruta: " << ruta << endl;
 
         cout << "ID: " << paciente->getId() << "\nNombre: " << paciente->getNombre() << "\nEdad: " <<
             paciente->getEdad() << "\nServicio: " << paciente->getServicio() << "\n" << endl;
@@ -306,6 +315,62 @@ void Sistema::verDepartamento() {
     cout << endl;
 }
 
+void Sistema::buscarPaciente() {
+    int opcion;
+
+    cout << "\n=== BUSCAR PACIENTE ===\n";
+    cout << "1. Buscar por ID\n";
+    cout << "2. Buscar por nombre\n";
+    cout << "Seleccione opcion: ";
+    cin >> opcion;
+
+    if (cin.fail() || opcion < 1 || opcion > 2) {
+        cout << "Opcion invalida" << endl;
+        cin.clear();
+        cin.ignore(10000, '\n');
+        return;
+    }
+
+    cin.ignore(10000, '\n');
+
+    string dato;
+    cout << "Ingrese " << (opcion == 1 ? "ID: " : "nombre: ");
+    getline(cin, dato);
+
+    if (dato.find_first_not_of(" \t\r") == string::npos) {
+        cout << "Debe ingresar un dato de busqueda." << endl;
+        return;
+    }
+
+    bool encontrado = false;
+    Nodo<Servicio*>* actual = this->listaServicios->getCabeza();
+
+    while (actual != nullptr) {
+        AVL* pacientes = actual->getValor()->getArbolPacientes();
+
+        if (opcion == 1) {
+            Paciente* paciente = pacientes->buscarID(dato);
+
+            if (paciente != nullptr) {
+                paciente->mostrarResumenBusqueda();
+                encontrado = true;
+                break;
+            }
+        } else {
+            if (pacientes->buscarNombre(dato)) {
+                encontrado = true;
+            }
+        }
+
+        actual = actual->getNext();
+    }
+
+    if (!encontrado) {
+        cout << "No se encontraron pacientes en los servicios."
+             << endl;
+    }
+}
+
 void Sistema::menu() {
 
     int opcion = 0;
@@ -315,7 +380,8 @@ void Sistema::menu() {
                 "1. Atender pacientes\n"
                 "2. Ver departamento\n"
                 "3. Revisar historial de atencion\n"
-                "4. Salir\n"
+                "4. Buscar paciente\n"
+                "5. Salir\n"
                 "\nSeleccionar opcion: " << endl;
         cin >> opcion;
     if (cin.fail()) {
@@ -330,6 +396,8 @@ void Sistema::menu() {
         } else if (opcion == 3) {
             revisarHistorial();
         } else if (opcion == 4) {
+            buscarPaciente();
+        } else if (opcion == 5) {
             cout << "Hasta luego :D." << endl;
             break;
         }
@@ -355,6 +423,7 @@ Sistema::~Sistema() {
         }
         delete this->listaServicios;
     }
+    delete this->arbolDecision;
 }
 
 

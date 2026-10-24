@@ -11,12 +11,14 @@
 #include "../dominio/Paciente.h"
 #include "../dominio/Servicio.h"
 #include "../dominio/Historial.h"
+#include "../estructuras/ArbolDecision.h"
 
 class Sistema {
 private:
     Cola<Paciente*>* colaEspera;
     Lista<Servicio*>* listaServicios;
     Historial* historial;
+    ArbolDecision* arbolDecision = nullptr;
 public:
     void iniciar();
 
@@ -28,6 +30,7 @@ public:
     void revisarHistorial();
     void verDepartamento();
     void atenderPacientes();
+    void buscarPaciente();
 
     Servicio* buscarServicio(std::string nombre);
 

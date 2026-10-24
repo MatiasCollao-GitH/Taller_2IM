@@ -30,6 +30,10 @@ void ArbolDecision::destruirRecursivo(NodoDecision* nodo) {
 }
 
 void ArbolDecision::construirArbol() {
+
+    destruirRecursivo(this->raiz);
+    this->raiz = nullptr;
+
     NodoDecision* n1_Edad = new NodoDecision(
         1, "¿Edad < 14?", "Edad < 14", "Edad >= 14");
     NodoDecision* n2_Trauma = new NodoDecision(
@@ -40,9 +44,13 @@ void ArbolDecision::construirArbol() {
     NodoDecision* n4_Neuro = new NodoDecision(
         4, "¿SintomasNeurologicos == 1?", "SintomasNeurologicos == 1", "SintomasNeurologicos == 0");
     NodoDecision* n5_Cardio = new NodoDecision(
-        5, "¿TipoDolor == pecho o Presion >= 140?", "TipoDolor == pecho / PA >= 140", "TipoDolor != pecho");
+        5, "¿TipoDolor == pecho o Presion >= 140?", "TipoDolor == pecho / PA >= 140", "TipoDolor != pecho y PA < 140");
     NodoDecision* n6_Urgencias = new NodoDecision(
-        6, "¿Temperatura >= 38.5 o Dolor >= 8?", "Temperatura >= 38.5 o Dolor >= 8", "Temperatura < 38.5 y Dolor < 8");
+    6,
+    "¿Temperatura >= 38.5 o Dolor >= 8 o RequiereCirugia == 1?",
+    "Temperatura >= 38.5 o Dolor >= 8 o RequiereCirugia == 1",
+    "Temperatura < 38.5 y Dolor < 8 y RequiereCirugia == 0"
+);
     NodoDecision* n7_Hosp = new NodoDecision(
         7, "¿DiasHospitalizacion >= 2?", "DiasHospitalizacion >= 2", "DiasHospitalizacion < 2");
 
