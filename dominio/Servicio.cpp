@@ -6,28 +6,21 @@
 
 Servicio::Servicio(const std::string& nombre) {
     this->nombre = nombre;
-    this->listaPacientes = new Lista<Paciente*>();
+    this->arbolPacientes = new AVL();
 }
 
 Servicio::~Servicio() {
-    if (this->listaPacientes != nullptr) {
-        Nodo<Paciente*>* actual = this->listaPacientes->getCabeza();
-        while (actual != nullptr) {
-            delete actual->getValor();
-            actual = actual->getNext();
-        }
-        delete this->listaPacientes;
-    }
+    delete this->arbolPacientes;
 }
 
 std::string Servicio::getNombre() const {
     return this->nombre;
 }
 
-Lista<Paciente*>* Servicio::getListaPacientes() {
-    return this->listaPacientes;
+AVL* Servicio::getArbolPacientes() {
+    return this->arbolPacientes;
 }
 
-void Servicio::agregarPaciente(Paciente* p) {
-    this->listaPacientes->agregarFinal(p);
+bool Servicio::agregarPaciente(Paciente* p) {
+    return this->arbolPacientes->insertar(p);
 }

@@ -72,12 +72,28 @@ Servicio* Sistema::buscarServicio(std::string nombre) {
 
 bool Sistema::existePaciente(std::string id) {
     Nodo<Paciente*>* actual = this->colaEspera->getInicio();
+
     while (actual != nullptr) {
-        Paciente* p = actual->getValor();
-        if (p != nullptr && p->getId() == id) {
+        Paciente* paciente = actual->getValor();
+
+        if (paciente != nullptr && paciente->getId() == id) {
             return true;
         }
+
         actual = actual->getNext();
+    }
+
+    Nodo<Servicio*>* servicioActual =
+        this->listaServicios->getCabeza();
+
+    while (servicioActual != nullptr) {
+        Servicio* servicio = servicioActual->getValor();
+
+        if (servicio->getArbolPacientes()->buscarID(id) != nullptr) {
+            return true;
+        }
+
+        servicioActual = servicioActual->getNext();
     }
 
     return false;
@@ -213,7 +229,11 @@ void Sistema::atenderPacientes() {
         cout << "=== ATENDIENDO PACIENTES ===" << endl;
 
         //Enviamos al paciente al servicio
-        servicio->agregarPaciente(paciente);
+        if (!servicio->agregarPaciente(paciente)) {
+            cout << "Error: No se pudo insertar el paciente en el servicio."
+                 << endl;
+            break;
+        }
 
         //Registramos atención en el hospital
         this->historial->registrarAtencion(paciente);
@@ -229,7 +249,6 @@ void Sistema::atenderPacientes() {
 }
 
 void Sistema::verDepartamento() {
-
     cout << "=== DEPARTAMENTOS/SERVICIOS ===" << endl;
 
     Nodo<Servicio*>* actual = this->listaServicios->getCabeza();
@@ -244,6 +263,7 @@ void Sistema::verDepartamento() {
         actual = actual->getNext();
         numero++;
     }
+
     int opcion;
 
     cout << "\nSeleccione departamento: ";
@@ -258,7 +278,6 @@ void Sistema::verDepartamento() {
         return;
     }
 
-    //Ver si existe el departamento
     if (opcion < 1 || opcion > this->listaServicios->getTamano()) {
         cout << "Departamento invalido" << endl;
         return;
@@ -266,38 +285,25 @@ void Sistema::verDepartamento() {
 
     actual = this->listaServicios->getCabeza();
 
-    //Avanzamos hasta el departamento elegido
     for (int i = 1; i < opcion; i++) {
         actual = actual->getNext();
     }
+
     Servicio* servicio = actual->getValor();
+    AVL* pacientes = servicio->getArbolPacientes();
 
-    cout << "\n=== ESTADO " << servicio->getNombre() << " ===" << endl;
+    cout << "\n=== ESTADO " << servicio->getNombre()
+         << " ===" << endl;
 
-    Lista<Paciente*>* pacientes = servicio->getListaPacientes();
-
-    //Ver si el departamento tiene pacientes
     if (pacientes->isEmpty()) {
         cout << "No hay pacientes en este departamento" << endl;
         return;
     }
-    cout << "Pacientes en el departamento de " << servicio->getNombre() << " : " << servicio->getListaPacientes()->getTamano() << endl;
 
+    cout << "\nPacientes ordenados por ID:" << endl;
+    pacientes->mostrarInorden();
 
-    Nodo<Paciente*>* pacienteActual = pacientes->getCabeza();
-
-    while (pacienteActual != nullptr) {
-        Paciente* paciente = pacienteActual->getValor();
-
-        if (paciente != nullptr) {
-            cout << paciente->getNombre() << "(" << paciente->getEdad() << ")" << endl;
-        }
-        pacienteActual = pacienteActual->getNext();
-
-    }
     cout << endl;
-
-
 }
 
 void Sistema::menu() {

@@ -6,21 +6,20 @@
 #define TALLER_1_IM_SERVICIO_H
 
 #include "Paciente.h"
-#include "../estructuras/Lista.h"
-
+#include "../estructuras/AVL.h"
 
 class Servicio {
 private:
     std::string nombre;
-    Lista<Paciente*>* listaPacientes;
+    AVL* arbolPacientes;
 
 public:
     Servicio(const std::string& nombre);
     ~Servicio();
 
     std::string getNombre() const;
-    Lista<Paciente*>* getListaPacientes();
-    void agregarPaciente(Paciente* p);
+    AVL* getArbolPacientes();
+    bool agregarPaciente(Paciente* p);
 };
 
 
